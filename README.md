@@ -1,10 +1,11 @@
-# 🤖 API Integration Research Agent
+#  API Integration Research Agent
 
 An autonomous multi-agent research and verification engine that audits API surfaces, authentication schemas, and access gating across 100 software platforms.
 
 ---
-
-## ⚡ Quick Start
+## Live URL
+https://gauri-dhanakshirur.github.io/Composio-Online-Assessment/
+## Quick Start
 
 ### 1. Install Dependencies
 
@@ -38,7 +39,7 @@ COMPOSIO_API_KEY=...
 
 ---
 
-## 🚀 How to Run the Research Agent
+## How to Run the Research Agent
 
 ### Option 1: Run the Full Multi-Agent Pipeline
 Runs the orchestrator agent across all 100 platforms (Discovery → Schema Extraction → Verification → Evaluation):
@@ -66,7 +67,7 @@ npm run verify
 
 ---
 
-## 📊 View Executive Dashboard
+## View Executive Dashboard
 
 Open `index.html` in your web browser to view interactive Chart.js analytics, root cause cards, and the searchable 100-app research matrix:
 
