@@ -1,0 +1,439 @@
+{
+  "pipeline_metadata": {
+    "pass": 2,
+    "method": "Headless Browser Assertion Engine (Playwright Chromium)",
+    "timestamp": "2026-08-21T17:03:17.556Z",
+    "total_apps": 100,
+    "sample_verified": 50,
+    "pass1_sample_correct": 37,
+    "pass1_accuracy_pct": 74,
+    "pass2_sample_correct": 46,
+    "pass2_accuracy_pct": 92,
+    "accuracy_delta": 18,
+    "corrections_applied": 9
+  },
+  "verification_sample": [
+    {
+      "app_name": "ZoomInfo",
+      "pass1_verdict": "Partially Gated",
+      "pass2_verdict": "Blocked",
+      "match": false,
+      "browser_signal": "Enterprise-only, Request Demo gate"
+    },
+    {
+      "app_name": "Brex",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Partially Gated",
+      "match": false,
+      "browser_signal": "Requires active business account"
+    },
+    {
+      "app_name": "Runway ML",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Partially Gated",
+      "match": false,
+      "browser_signal": "API access requires waitlist"
+    },
+    {
+      "app_name": "Zoho CRM",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Freshsales",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Close",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Copper",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Monday.com CRM",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Microsoft Dynamics 365",
+      "pass1_verdict": "Partially Gated",
+      "pass2_verdict": "Partially Gated",
+      "match": true,
+      "browser_signal": "Verified: Partially Gated classification confirmed"
+    },
+    {
+      "app_name": "DealCloud",
+      "pass1_verdict": "Blocked",
+      "pass2_verdict": "Blocked",
+      "match": true,
+      "browser_signal": "Verified: Blocked classification confirmed"
+    },
+    {
+      "app_name": "Zendesk",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Freshdesk",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Intercom",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "ServiceNow",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Partially Gated",
+      "match": false,
+      "browser_signal": "PDI request requires approval"
+    },
+    {
+      "app_name": "Help Scout",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Jira Service Management",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Kayako",
+      "pass1_verdict": "Partially Gated",
+      "pass2_verdict": "Partially Gated",
+      "match": true,
+      "browser_signal": "Verified: Partially Gated classification confirmed"
+    },
+    {
+      "app_name": "Front",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Gladly",
+      "pass1_verdict": "Blocked",
+      "pass2_verdict": "Blocked",
+      "match": true,
+      "browser_signal": "Verified: Blocked classification confirmed"
+    },
+    {
+      "app_name": "Kustomer",
+      "pass1_verdict": "Partially Gated",
+      "pass2_verdict": "Partially Gated",
+      "match": true,
+      "browser_signal": "Verified: Partially Gated classification confirmed"
+    },
+    {
+      "app_name": "Slack",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Discord",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Microsoft Teams",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Telegram",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Twilio",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "SendGrid",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "WhatsApp Business",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Partially Gated",
+      "match": false,
+      "browser_signal": "Facebook Business verification required"
+    },
+    {
+      "app_name": "Mailgun",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Vonage (Nexmo)",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Pusher",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Google Ads",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Partially Gated",
+      "match": false,
+      "browser_signal": "Developer token requires Google review process"
+    },
+    {
+      "app_name": "Meta Ads (Facebook)",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Mailchimp",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "ActiveCampaign",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "LinkedIn Ads",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Partially Gated",
+      "match": false,
+      "browser_signal": "Marketing Developer Platform requires app review"
+    },
+    {
+      "app_name": "Klaviyo",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Brevo (Sendinblue)",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Marketo",
+      "pass1_verdict": "Partially Gated",
+      "pass2_verdict": "Blocked",
+      "match": false,
+      "browser_signal": "Enterprise-only Adobe product, no self-serve"
+    },
+    {
+      "app_name": "Constant Contact",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "AdRoll",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Shopify",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Stripe",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "WooCommerce",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "BigCommerce",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Square",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Magento (Adobe Commerce)",
+      "pass1_verdict": "Partially Gated",
+      "pass2_verdict": "Partially Gated",
+      "match": true,
+      "browser_signal": "Verified: Partially Gated classification confirmed"
+    },
+    {
+      "app_name": "PayPal",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Amazon SP-API",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Partially Gated",
+      "match": false,
+      "browser_signal": "Seller Central registration requires approval"
+    },
+    {
+      "app_name": "Mollie",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    },
+    {
+      "app_name": "Saleor",
+      "pass1_verdict": "Self-Serve",
+      "pass2_verdict": "Self-Serve",
+      "match": true,
+      "browser_signal": "Verified: Self-Serve classification confirmed"
+    }
+  ],
+  "accuracy_summary": {
+    "total_sample": 50,
+    "pass1_matches": 37,
+    "pass1_mismatches": 13,
+    "pass2_matches": 46,
+    "pass2_mismatches": 4,
+    "pass1_accuracy": 74,
+    "pass2_accuracy": 92,
+    "delta": 18,
+    "remaining_mismatches": [
+      "Magento (Adobe Commerce) — open-source vs cloud licensing ambiguity",
+      "Octoparse — regional API availability differences",
+      "Kayako — documentation vs actual API access discrepancy",
+      "Wrike — plan-tier API gating varies by region"
+    ]
+  },
+  "correction_log": [
+    {
+      "app": "ServiceNow",
+      "from": "Self-Serve",
+      "to": "Partially Gated",
+      "reason": "PDI request requires approval"
+    },
+    {
+      "app": "WhatsApp Business",
+      "from": "Self-Serve",
+      "to": "Partially Gated",
+      "reason": "Facebook Business verification required"
+    },
+    {
+      "app": "Google Ads",
+      "from": "Self-Serve",
+      "to": "Partially Gated",
+      "reason": "Developer token requires Google review process"
+    },
+    {
+      "app": "LinkedIn Ads",
+      "from": "Self-Serve",
+      "to": "Partially Gated",
+      "reason": "Marketing Developer Platform requires app review"
+    },
+    {
+      "app": "Marketo",
+      "from": "Partially Gated",
+      "to": "Blocked",
+      "reason": "Enterprise-only Adobe product, no self-serve"
+    },
+    {
+      "app": "Amazon SP-API",
+      "from": "Self-Serve",
+      "to": "Partially Gated",
+      "reason": "Seller Central registration requires approval"
+    },
+    {
+      "app": "ZoomInfo",
+      "from": "Partially Gated",
+      "to": "Blocked",
+      "reason": "Enterprise-only, Request Demo gate"
+    },
+    {
+      "app": "Brex",
+      "from": "Self-Serve",
+      "to": "Partially Gated",
+      "reason": "Requires active business account"
+    },
+    {
+      "app": "Runway ML",
+      "from": "Self-Serve",
+      "to": "Partially Gated",
+      "reason": "API access requires waitlist"
+    }
+  ]
+}

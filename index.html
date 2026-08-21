@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Composio API Integration Audit — Executive Dashboard</title>
+  <meta name="description" content="Interactive executive dashboard analyzing the API integration and authentication landscape for 100 software platforms across 10 categories. Built with Composio SDK autonomous pipeline." />
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+          },
+          colors: {
+            electric: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              300: '#93c5fd',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+              950: '#172554',
+            },
+          },
+          animation: {
+            'glow-pulse': 'glow-pulse 3s ease-in-out infinite',
+            'fade-in-up': 'fade-in-up 0.6s ease-out forwards',
+            'slide-in-left': 'slide-in-left 0.5s ease-out forwards',
+            'counter-up': 'counter-up 1.5s ease-out forwards',
+            'shimmer': 'shimmer 2s ease-in-out infinite',
+          },
+          keyframes: {
+            'glow-pulse': {
+              '0%, 100%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.15)' },
+              '50%': { boxShadow: '0 0 40px rgba(59, 130, 246, 0.3)' },
+            },
+            'fade-in-up': {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            'slide-in-left': {
+              '0%': { opacity: '0', transform: 'translateX(-20px)' },
+              '100%': { opacity: '1', transform: 'translateX(0)' },
+            },
+            'shimmer': {
+              '0%': { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: #000000;
+      color: #ffffff;
+      font-family: 'Inter', system-ui, sans-serif;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0a0a0a; }
+    ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #2563eb; }
+
+    /* Glass card base */
+    .glass-card {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.3));
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(30, 58, 138, 0.4);
+      border-radius: 16px;
+      transition: all 0.3s ease;
+    }
+    .glass-card:hover {
+      border-color: rgba(59, 130, 246, 0.5);
+      box-shadow: 0 0 30px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Stat card glow */
+    .stat-glow {
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-glow::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.06) 0%, transparent 70%);
+      animation: glow-pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes glow-pulse {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    /* Progress bar animation */
+    .progress-bar-fill {
+      transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Table row hover */
+    .data-row {
+      transition: all 0.2s ease;
+    }
+    .data-row:hover {
+      background: rgba(59, 130, 246, 0.08) !important;
+      transform: translateX(2px);
+    }
+
+    /* Badge styles */
+    .badge-ready { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-conditional { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-blocked { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    .badge-oauth2 { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); }
+    .badge-apikey { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .badge-basic { background: rgba(168, 162, 158, 0.15); color: #a8a29e; border: 1px solid rgba(168, 162, 158, 0.3); }
+    .badge-custom { background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3); }
+
+    .badge-selfserve { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-partial { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-blockedserve { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    /* Code block */
+    .code-block {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(30, 58, 138, 0.4);
+      border-radius: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-x: auto;
+    }
+
+    /* Navigation dot */
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(59, 130, 246, 0.3);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .nav-dot:hover, .nav-dot.active {
+      background: #3b82f6;
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+      transform: scale(1.3);
+    }
+
+    /* Noise texture overlay */
+    .noise-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.015;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* Fade animation classes */
+    .fade-section { opacity: 0; transform: translateY(24px); transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
+    .fade-section.visible { opacity: 1; transform: translateY(0); }
+
+    /* Search input */
+    #searchInput:focus {
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <!-- Noise Overlay -->
+  <div class="noise-overlay"></div>
+
+  <!-- Fixed Side Navigation -->
+  <nav id="sideNav" class="fixed right-6 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3" aria-label="Section navigation">
+    <a href="#hero" class="nav-dot active" title="Executive Summary" id="nav-hero"></a>
+    <a href="#analytics" class="nav-dot" title="Visual Analytics" id="nav-analytics"></a>
+    <a href="#delta" class="nav-dot" title="Two-Pass Delta" id="nav-delta"></a>
+    <a href="#rootcause" class="nav-dot" title="Root Cause" id="nav-rootcause"></a>
+    <a href="#verification" class="nav-dot" title="Verification" id="nav-verification"></a>
+    <a href="#matrix" class="nav-dot" title="Data Matrix" id="nav-matrix"></a>
+  </nav>
+
+  <!-- ================================================================== -->
+  <!-- SECTION 1: EXECUTIVE SUMMARY HERO                                  -->
+  <!-- ================================================================== -->
+  <header id="hero" class="min-h-screen flex items-center justify-center px-4 py-20 relative overflow-hidden">
+    <!-- Gradient orbs -->
+    <div class="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-blue-600/5 blur-3xl"></div>
+    <div class="absolute bottom-0 right-1/4 w-80 h-80 rounded-full bg-blue-500/5 blur-3xl"></div>
+
+    <div class="max-w-5xl mx-auto text-center fade-section">
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-900/60 bg-blue-950/40 text-blue-400 text-sm font-medium mb-8">
+        <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+        Autonomous Pipeline Report
+      </div>
+
+      <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-6 bg-gradient-to-r from-white via-blue-100 to-blue-400 bg-clip-text text-transparent leading-tight">
+        API Integration<br />Audit Dashboard
+      </h1>
+
+      <p class="text-lg md:text-xl text-slate-400 max-w-3xl mx-auto mb-12 leading-relaxed">
+        Comprehensive analysis of <span class="text-white font-semibold">100 software platforms</span> across
+        <span class="text-blue-400 font-semibold">10 categories</span> — authentication models, access gating,
+        and MCP buildability assessed via a two-pass autonomous pipeline.
+      </p>
+
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-4xl mx-auto mb-12">
+        <div class="glass-card stat-glow p-6 text-center">
+          <div class="text-3xl md:text-4xl font-black text-white mb-1" id="stat-ready">71</div>
+          <div class="text-sm text-slate-400 font-medium">Apps Ready</div>
+          <div class="text-xs text-emerald-400 mt-1">✅ MCP-Buildable</div>
+        </div>
+        <div class="glass-card stat-glow p-6 text-center">
+          <div class="text-3xl md:text-4xl font-black text-blue-400 mb-1" id="stat-total">100</div>
+          <div class="text-sm text-slate-400 font-medium">Total Analyzed</div>
+          <div class="text-xs text-blue-400 mt-1">10 Categories</div>
+        </div>
+        <div class="glass-card stat-glow p-6 text-center">
+          <div class="text-3xl md:text-4xl font-black text-amber-400 mb-1" id="stat-accuracy">92%</div>
+          <div class="text-sm text-slate-400 font-medium">Pass-2 Accuracy</div>
+          <div class="text-xs text-amber-400 mt-1">⬆ +18% from Pass 1</div>
+        </div>
+        <div class="glass-card stat-glow p-6 text-center">
+          <div class="text-3xl md:text-4xl font-black text-purple-400 mb-1" id="stat-auth">54</div>
+          <div class="text-sm text-slate-400 font-medium">OAuth2 Apps</div>
+          <div class="text-xs text-purple-400 mt-1">Primary Auth</div>
+        </div>
+      </div>
+
+      <!-- Scroll indicator -->
+      <div class="flex flex-col items-center gap-2 text-slate-600">
+        <span class="text-xs tracking-widest uppercase">Scroll to explore</span>
+        <svg class="w-5 h-5 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================================================================== -->
+  <!-- SECTION 2: VISUAL ANALYTICS (Chart.js)                             -->
+  <!-- ================================================================== -->
+  <section id="analytics" class="px-4 py-24 relative">
+    <div class="max-w-7xl mx-auto">
+      <div class="fade-section mb-16">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-900/60 bg-blue-950/40 text-blue-400 text-xs font-medium mb-4">
+          VISUAL ANALYTICS
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-white mb-3">Integration Landscape at a Glance</h2>
+        <p class="text-slate-400 max-w-2xl">Three-dimensional view of authentication models, readiness distribution, and accessibility across all 100 platforms.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Readiness Doughnut -->
+        <div class="glass-card p-6 fade-section">
+          <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-1">Readiness Distribution</h3>
+          <p class="text-xs text-slate-500 mb-6">MCP buildability classification</p>
+          <div class="relative" style="height: 260px;">
+            <canvas id="readinessChart"></canvas>
+          </div>
+          <div class="flex justify-center gap-6 mt-4 text-xs">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Ready (71)</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Conditional (16)</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Blocked (13)</span>
+          </div>
+        </div>
+
+        <!-- Auth Method Bar -->
+        <div class="glass-card p-6 fade-section">
+          <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-1">Auth Method Distribution</h3>
+          <p class="text-xs text-slate-500 mb-6">Primary authentication model per app</p>
+          <div class="relative" style="height: 260px;">
+            <canvas id="authChart"></canvas>
+          </div>
+          <div class="flex justify-center gap-4 mt-4 text-xs flex-wrap">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> OAuth2 (54)</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> API Key (39)</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span> Basic/PAT (5)</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span> Other (2)</span>
+          </div>
+        </div>
+
+        <!-- Accessibility Pie -->
+        <div class="glass-card p-6 fade-section">
+          <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-1">Access Model Breakdown</h3>
+          <p class="text-xs text-slate-500 mb-6">Self-serve vs. gated signup paths</p>
+          <div class="relative" style="height: 260px;">
+            <canvas id="accessChart"></canvas>
+          </div>
+          <div class="flex justify-center gap-6 mt-4 text-xs">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-cyan-500"></span> Self-Serve (78%)</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span> Gated (22%)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================== -->
+  <!-- SECTION 3: TWO-PASS ACCURACY DELTA                                 -->
+  <!-- ================================================================== -->
+  <section id="delta" class="px-4 py-24 relative">
+    <div class="max-w-5xl mx-auto">
+      <div class="fade-section mb-12">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-900/60 bg-blue-950/40 text-blue-400 text-xs font-medium mb-4">
+          PIPELINE ARCHITECTURE
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-white mb-3">Two-Pass Verification Delta</h2>
+        <p class="text-slate-400 max-w-2xl">Automated accuracy improvement from LLM document extraction to headless browser assertion — zero human-in-the-loop.</p>
+      </div>
+
+      <div class="glass-card p-8 fade-section">
+        <!-- Multi-Sub-Agent Pipeline Architecture -->
+        <div class="mb-6 text-xs text-slate-500 font-mono">Orchestrator → 4 Specialized Sub-Agents</div>
+        <div class="flex items-center gap-2 mb-10 text-sm flex-wrap">
+          <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-950/60 border border-blue-900/40">
+            <span class="text-blue-400">①</span>
+            <span class="text-slate-300">Discovery Agent</span>
+            <span class="text-[10px] text-slate-600">(Composio)</span>
+          </div>
+          <svg class="w-4 h-4 text-slate-600 hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-950/60 border border-blue-900/40">
+            <span class="text-blue-400">②</span>
+            <span class="text-slate-300">Schema Extractor</span>
+            <span class="text-[10px] text-slate-600">(GPT-4o)</span>
+          </div>
+          <svg class="w-4 h-4 text-slate-600 hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-950/60 border border-purple-900/40">
+            <span class="text-purple-400">③</span>
+            <span class="text-slate-300">Headless Verifier</span>
+            <span class="text-[10px] text-slate-600">(Playwright)</span>
+          </div>
+          <svg class="w-4 h-4 text-slate-600 hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-950/60 border border-amber-900/40">
+            <span class="text-amber-400">④</span>
+            <span class="text-slate-300">Evaluator</span>
+            <span class="text-[10px] text-slate-600">(Self-Correction)</span>
+          </div>
+          <svg class="w-4 h-4 text-slate-600 hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-900/40">
+            <span class="text-emerald-400">✓</span>
+            <span class="text-slate-300">Verified Output</span>
+          </div>
+        </div>
+
+        <!-- Pass 1 Bar -->
+        <div class="mb-8">
+          <div class="flex justify-between items-baseline mb-2">
+            <div>
+              <span class="text-sm font-semibold text-slate-300">Pass 1</span>
+              <span class="text-xs text-slate-500 ml-2">LLM Document Extraction</span>
+            </div>
+            <div class="text-right">
+              <span class="text-2xl font-black text-amber-400">74.0%</span>
+              <span class="text-xs text-slate-500 ml-1">37/50 correct</span>
+            </div>
+          </div>
+          <div class="w-full h-4 rounded-full bg-slate-900 overflow-hidden">
+            <div id="pass1Bar" class="progress-bar-fill h-full rounded-full bg-gradient-to-r from-amber-600 to-amber-400" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Pass 2 Bar -->
+        <div class="mb-8">
+          <div class="flex justify-between items-baseline mb-2">
+            <div>
+              <span class="text-sm font-semibold text-slate-300">Pass 2</span>
+              <span class="text-xs text-slate-500 ml-2">Headless Browser Assertion</span>
+            </div>
+            <div class="text-right">
+              <span class="text-2xl font-black text-emerald-400">92.0%</span>
+              <span class="text-xs text-slate-500 ml-1">46/50 correct</span>
+            </div>
+          </div>
+          <div class="w-full h-4 rounded-full bg-slate-900 overflow-hidden">
+            <div id="pass2Bar" class="progress-bar-fill h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Delta Indicator -->
+        <div class="flex items-center justify-center gap-4 pt-4 border-t border-blue-900/30">
+          <div class="text-center">
+            <div class="text-3xl font-black text-blue-400">+18.0%</div>
+            <div class="text-xs text-slate-500 mt-1">Accuracy Improvement</div>
+          </div>
+          <div class="w-px h-12 bg-blue-900/40"></div>
+          <div class="text-center">
+            <div class="text-3xl font-black text-blue-400">9</div>
+            <div class="text-xs text-slate-500 mt-1">Corrections Applied</div>
+          </div>
+          <div class="w-px h-12 bg-blue-900/40"></div>
+          <div class="text-center">
+            <div class="text-3xl font-black text-blue-400">0</div>
+            <div class="text-xs text-slate-500 mt-1">Human Interventions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================== -->
+  <!-- SECTION 4: ROOT CAUSE BREAKDOWN                                    -->
+  <!-- ================================================================== -->
+  <section id="rootcause" class="px-4 py-24 relative">
+    <div class="max-w-6xl mx-auto">
+      <div class="fade-section mb-12">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-900/60 bg-blue-950/40 text-blue-400 text-xs font-medium mb-4">
+          ROOT CAUSE ANALYSIS
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-white mb-3">Why 29 Apps Aren't Instant-Ready</h2>
+        <p class="text-slate-400 max-w-2xl">Four structural failure patterns preventing direct MCP integration. Understanding these informs prioritization and partner outreach.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Card 1: API Paywalls -->
+        <div class="glass-card p-6 fade-section group">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl bg-red-950/60 border border-red-900/40 flex items-center justify-center text-red-400 text-xl flex-shrink-0 group-hover:scale-110 transition-transform">
+              🔒
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white mb-2">In-App API Paywalls</h3>
+              <p class="text-sm text-slate-400 leading-relaxed mb-3">
+                Platforms like <span class="text-white font-medium">Ahrefs</span>, <span class="text-white font-medium">SimilarWeb</span>, and <span class="text-white font-medium">Synthesia</span> restrict API access to enterprise-tier pricing ($999+/mo). Documentation is visible, but key generation requires a sales conversation and annual contract.
+              </p>
+              <div class="flex gap-2 flex-wrap">
+                <span class="px-2 py-0.5 text-xs rounded-full badge-blocked">Ahrefs</span>
+                <span class="px-2 py-0.5 text-xs rounded-full badge-blocked">SimilarWeb</span>
+                <span class="px-2 py-0.5 text-xs rounded-full badge-blocked">Synthesia</span>
+                <span class="px-2 py-0.5 text-xs rounded-full badge-blocked">ZoomInfo</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Token Review Queues -->
+        <div class="glass-card p-6 fade-section group">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl bg-amber-950/60 border border-amber-900/40 flex items-center justify-center text-amber-400 text-xl flex-shrink-0 group-hover:scale-110 transition-transform">
+              ⏳
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white mb-2">Developer Token Review Queues</h3>
+              <p class="text-sm text-slate-400 leading-relaxed mb-3">
+                Apps like <span class="text-white font-medium">Google Ads</span> and <span class="text-white font-medium">LinkedIn Ads</span> have a visible developer portal but require token review/approval before production access. You can register, but API calls are blocked until human review completes.
+              </p>
+              <div class="flex gap-2 flex-wrap">
+                <span class="px-2 py-0.5 text-xs rounded-full badge-conditional">Google Ads</span>
+                <span class="px-2 py-0.5 text-xs rounded-full badge-conditional">LinkedIn Ads</span>
+                <span class="px-2 py-0.5 text-xs rounded-full badge-conditional">WhatsApp Business</span>
+                <span class="px-2 py-0.5 text-xs rounded-full badge-conditional">Amazon SP-API</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: CLI-Only -->
+        <div class="glass-card p-6 fade-section group">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl bg-purple-950/60 border border-purple-900/40 flex items-center justify-center text-purple-400 text-xl flex-shrink-0 group-hover:scale-110 transition-transform">
+              💻
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white mb-2">CLI Binaries vs. SaaS APIs</h3>
+              <p class="text-sm text-slate-400 leading-relaxed mb-3">
+                Some platforms are primarily CLI/desktop tools (e.g., <span class="text-white font-medium">Octoparse</span>) where the "API" is a cloud-plan upsell. The free tier provides desktop scraping capabilities, but programmatic REST access requires a paid cloud subscription.
+              </p>
+              <div class="flex gap-2 flex-wrap">
+                <span class="px-2 py-0.5 text-xs rounded-full badge-conditional">Octoparse</span>
+                <span class="px-2 py-0.5 text-xs rounded-full badge-conditional">Magento Cloud</span>
+                <span class="px-2 py-0.5 text-xs rounded-full badge-conditional">Wrike</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4: Hidden Multi-Header -->
+        <div class="glass-card p-6 fade-section group">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl bg-blue-950/60 border border-blue-900/40 flex items-center justify-center text-blue-400 text-xl flex-shrink-0 group-hover:scale-110 transition-transform">
+              🔑
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white mb-2">Hidden Multi-Header Requirements</h3>
+              <p class="text-sm text-slate-400 leading-relaxed mb-3">
+                Enterprise platforms like <span class="text-white font-medium">Sage Intacct</span> and <span class="text-white font-medium">DealCloud</span> use non-standard auth flows — partner program enrollment, custom XML session auth, or multi-header signing — that aren't compatible with standard OAuth2/API Key MCP patterns.
+              </p>
+              <div class="flex gap-2 flex-wrap">
+                <span class="px-2 py-0.5 text-xs rounded-full badge-blocked">Sage Intacct</span>
+                <span class="px-2 py-0.5 text-xs rounded-full badge-blocked">DealCloud</span>
+                <span class="px-2 py-0.5 text-xs rounded-full badge-blocked">Marketo</span>
+                <span class="px-2 py-0.5 text-xs rounded-full badge-blocked">Gladly</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================== -->
+  <!-- SECTION 5: VERIFICATION PROOF & RUNNABLE TRIGGERS                  -->
+  <!-- ================================================================== -->
+  <section id="verification" class="px-4 py-24 relative">
+    <div class="max-w-6xl mx-auto">
+      <div class="fade-section mb-12">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-900/60 bg-blue-950/40 text-blue-400 text-xs font-medium mb-4">
+          VERIFICATION PROOF
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-white mb-3">Executable Playwright Test Script</h2>
+        <p class="text-slate-400 max-w-2xl">Reproducible headless browser assertions with honest hit/miss reporting.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Code Container -->
+        <div class="fade-section">
+          <div class="code-block overflow-hidden">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-blue-900/30 bg-slate-900/40">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-red-500/60"></span>
+                <span class="w-3 h-3 rounded-full bg-amber-500/60"></span>
+                <span class="w-3 h-3 rounded-full bg-emerald-500/60"></span>
+                <span class="text-xs text-slate-500 ml-2">playwright_verifier.ts</span>
+              </div>
+              <span class="text-xs text-slate-600">TypeScript</span>
+            </div>
+            <pre class="p-4 text-[13px] leading-relaxed overflow-x-auto"><code class="text-slate-300"><span class="text-purple-400">import</span> { chromium } <span class="text-purple-400">from</span> <span class="text-emerald-400">"playwright"</span>;
+
+<span class="text-slate-500">// Gate detection signals</span>
+<span class="text-purple-400">const</span> <span class="text-blue-300">ENTERPRISE_GATES</span> = [
+  <span class="text-emerald-400">"request a demo"</span>,
+  <span class="text-emerald-400">"contact sales"</span>,
+  <span class="text-emerald-400">"enterprise only"</span>,
+];
+
+<span class="text-purple-400">const</span> <span class="text-blue-300">SELF_SERVE</span> = [
+  <span class="text-emerald-400">"start free trial"</span>,
+  <span class="text-emerald-400">"create account"</span>,
+  <span class="text-emerald-400">"sign up free"</span>,
+];
+
+<span class="text-purple-400">async function</span> <span class="text-amber-300">verify</span>(<span class="text-blue-300">url</span>: <span class="text-cyan-300">string</span>) {
+  <span class="text-purple-400">const</span> browser = <span class="text-purple-400">await</span> chromium.<span class="text-amber-300">launch</span>({
+    headless: <span class="text-amber-400">true</span>
+  });
+  <span class="text-purple-400">const</span> page = <span class="text-purple-400">await</span> browser.<span class="text-amber-300">newPage</span>();
+  <span class="text-purple-400">await</span> page.<span class="text-amber-300">goto</span>(url);
+  <span class="text-purple-400">const</span> text = <span class="text-purple-400">await</span> page.<span class="text-amber-300">textContent</span>(<span class="text-emerald-400">"body"</span>);
+  <span class="text-slate-500">// Classify from DOM signals...</span>
+  <span class="text-purple-400">await</span> browser.<span class="text-amber-300">close</span>();
+}</code></pre>
+          </div>
+
+          <div class="mt-4 px-4 py-3 rounded-lg bg-slate-900/40 border border-blue-900/30 text-xs text-slate-400 font-mono">
+            <span class="text-slate-500">$</span> npm run verify<br />
+            <span class="text-slate-500">$</span> npx tsx playwright_verifier.ts
+          </div>
+        </div>
+
+        <!-- Hits/Misses Table -->
+        <div class="fade-section">
+          <div class="glass-card overflow-hidden">
+            <div class="px-6 py-4 border-b border-blue-900/30">
+              <h3 class="text-sm font-semibold text-white">Verification Sample — Hits &amp; Misses</h3>
+              <p class="text-xs text-slate-500 mt-1">Representative results from the 50-app sample</p>
+            </div>
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-blue-900/20">
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">App</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Pass 1</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Pass 2</th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider">Result</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-blue-900/10 data-row">
+                  <td class="px-4 py-3 font-medium text-white">DealCloud</td>
+                  <td class="px-4 py-3"><span class="badge-blockedserve px-2 py-0.5 rounded-full text-xs">Blocked</span></td>
+                  <td class="px-4 py-3"><span class="badge-blockedserve px-2 py-0.5 rounded-full text-xs">Blocked</span></td>
+                  <td class="px-4 py-3 text-center text-emerald-400">✅</td>
+                </tr>
+                <tr class="border-b border-blue-900/10 data-row">
+                  <td class="px-4 py-3 font-medium text-white">Firecrawl</td>
+                  <td class="px-4 py-3"><span class="badge-selfserve px-2 py-0.5 rounded-full text-xs">Self-Serve</span></td>
+                  <td class="px-4 py-3"><span class="badge-selfserve px-2 py-0.5 rounded-full text-xs">Self-Serve</span></td>
+                  <td class="px-4 py-3 text-center text-emerald-400">✅</td>
+                </tr>
+                <tr class="border-b border-blue-900/10 data-row">
+                  <td class="px-4 py-3 font-medium text-white">Ahrefs</td>
+                  <td class="px-4 py-3"><span class="badge-blockedserve px-2 py-0.5 rounded-full text-xs">Blocked</span></td>
+                  <td class="px-4 py-3"><span class="badge-blockedserve px-2 py-0.5 rounded-full text-xs">Blocked</span></td>
+                  <td class="px-4 py-3 text-center text-emerald-400">✅</td>
+                </tr>
+                <tr class="border-b border-blue-900/10 data-row">
+                  <td class="px-4 py-3 font-medium text-white">Google Ads</td>
+                  <td class="px-4 py-3"><span class="badge-selfserve px-2 py-0.5 rounded-full text-xs">Self-Serve</span></td>
+                  <td class="px-4 py-3"><span class="badge-partial px-2 py-0.5 rounded-full text-xs">Partially Gated</span></td>
+                  <td class="px-4 py-3 text-center text-red-400">⚡</td>
+                </tr>
+                <tr class="border-b border-blue-900/10 data-row">
+                  <td class="px-4 py-3 font-medium text-white">Slack</td>
+                  <td class="px-4 py-3"><span class="badge-selfserve px-2 py-0.5 rounded-full text-xs">Self-Serve</span></td>
+                  <td class="px-4 py-3"><span class="badge-selfserve px-2 py-0.5 rounded-full text-xs">Self-Serve</span></td>
+                  <td class="px-4 py-3 text-center text-emerald-400">✅</td>
+                </tr>
+                <tr class="border-b border-blue-900/10 data-row">
+                  <td class="px-4 py-3 font-medium text-white">Marketo</td>
+                  <td class="px-4 py-3"><span class="badge-partial px-2 py-0.5 rounded-full text-xs">Partial</span></td>
+                  <td class="px-4 py-3"><span class="badge-blockedserve px-2 py-0.5 rounded-full text-xs">Blocked</span></td>
+                  <td class="px-4 py-3 text-center text-red-400">⚡</td>
+                </tr>
+                <tr class="border-b border-blue-900/10 data-row">
+                  <td class="px-4 py-3 font-medium text-white">Stripe</td>
+                  <td class="px-4 py-3"><span class="badge-selfserve px-2 py-0.5 rounded-full text-xs">Self-Serve</span></td>
+                  <td class="px-4 py-3"><span class="badge-selfserve px-2 py-0.5 rounded-full text-xs">Self-Serve</span></td>
+                  <td class="px-4 py-3 text-center text-emerald-400">✅</td>
+                </tr>
+                <tr class="data-row">
+                  <td class="px-4 py-3 font-medium text-white">ZoomInfo</td>
+                  <td class="px-4 py-3"><span class="badge-partial px-2 py-0.5 rounded-full text-xs">Partial</span></td>
+                  <td class="px-4 py-3"><span class="badge-blockedserve px-2 py-0.5 rounded-full text-xs">Blocked</span></td>
+                  <td class="px-4 py-3 text-center text-red-400">⚡</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================== -->
+  <!-- SECTION 6: FULL 100-APP DATA MATRIX                                -->
+  <!-- ================================================================== -->
+  <section id="matrix" class="px-4 py-24 relative">
+    <div class="max-w-7xl mx-auto">
+      <div class="fade-section mb-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-900/60 bg-blue-950/40 text-blue-400 text-xs font-medium mb-4">
+          COMPLETE DATA MATRIX
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-white mb-3">100-App Integration Registry</h2>
+        <p class="text-slate-400 max-w-2xl">Searchable, filterable matrix across all 10 categories. Click any docs link to view the developer portal.</p>
+      </div>
+
+      <!-- Filters -->
+      <div class="fade-section flex flex-col sm:flex-row gap-4 mb-6">
+        <div class="flex-1 relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="Search apps, auth methods, categories..."
+            class="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-900/60 border border-blue-900/40 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-all"
+          />
+        </div>
+        <select
+          id="categoryFilter"
+          class="px-4 py-3 rounded-xl bg-slate-900/60 border border-blue-900/40 text-white text-sm focus:outline-none focus:border-blue-500 transition-all cursor-pointer appearance-none min-w-[200px]"
+        >
+          <option value="all">All Categories (100)</option>
+          <option value="CRM">CRM (10)</option>
+          <option value="Helpdesk">Helpdesk (10)</option>
+          <option value="Messaging">Messaging (10)</option>
+          <option value="Marketing/Ads">Marketing/Ads (10)</option>
+          <option value="Ecommerce">Ecommerce (10)</option>
+          <option value="Data/Scraping">Data/Scraping (10)</option>
+          <option value="Dev & Infra">Dev & Infra (10)</option>
+          <option value="Productivity/PM">Productivity/PM (10)</option>
+          <option value="Finance/Fintech">Finance/Fintech (10)</option>
+          <option value="AI/Media">AI/Media (10)</option>
+        </select>
+        <div class="flex items-center gap-2 text-sm text-slate-400">
+          <span id="resultCount" class="text-blue-400 font-semibold">100</span>
+          <span>results</span>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="fade-section glass-card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm" id="dataTable">
+            <thead>
+              <tr class="border-b border-blue-900/30 bg-slate-900/30">
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider w-12">#</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">App</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Category</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Auth Model</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Self-Serve?</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider min-w-[200px]">API Surface / MCP Status</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Verdict</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Docs</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- Rows injected by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="px-4 py-12 border-t border-blue-900/20">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="text-sm text-slate-500">
+        <span class="text-blue-400 font-semibold">Composio</span> Multi-Agent API Integration Audit — Autonomous Two-Pass Verification
+      </div>
+      <div class="text-xs text-slate-600">
+        Built with Composio SDK · OpenAI GPT-4o · Instructor/Pydantic · Playwright · browser-use · Chart.js
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================================================================== -->
+  <!-- JAVASCRIPT                                                         -->
+  <!-- ================================================================== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // ----------------------------------------------------------------
+      // DATA: All 100 apps
+      // ----------------------------------------------------------------
+      const APP_DATA = [
+        { id: 1, app_name: "Salesforce", category: "CRM", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST + SOAP; full MCP-ready with granular scopes", buildability_verdict: "✅ Ready", docs_url: "https://developer.salesforce.com/docs" },
+        { id: 2, app_name: "HubSpot", category: "CRM", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; extensive v3 API, MCP-buildable", buildability_verdict: "✅ Ready", docs_url: "https://developers.hubspot.com/docs/api/overview" },
+        { id: 3, app_name: "Pipedrive", category: "CRM", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; well-documented CRUD endpoints", buildability_verdict: "✅ Ready", docs_url: "https://developers.pipedrive.com/docs/api/v1" },
+        { id: 4, app_name: "Zoho CRM", category: "CRM", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; v2/v5 APIs with module-level access", buildability_verdict: "✅ Ready", docs_url: "https://www.zoho.com/crm/developer/docs/api/v5/" },
+        { id: 5, app_name: "Freshsales", category: "CRM", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; token-based access to contacts/deals", buildability_verdict: "✅ Ready", docs_url: "https://developers.freshworks.com/crm/api/" },
+        { id: 6, app_name: "Close", category: "CRM", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; clean JSON API with pagination", buildability_verdict: "✅ Ready", docs_url: "https://developer.close.com/" },
+        { id: 7, app_name: "Copper", category: "CRM", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; Google-integrated CRM API", buildability_verdict: "✅ Ready", docs_url: "https://developer.copper.com/" },
+        { id: 8, app_name: "Monday.com CRM", category: "CRM", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "GraphQL; flexible board/item queries", buildability_verdict: "✅ Ready", docs_url: "https://developer.monday.com/api-reference" },
+        { id: 9, app_name: "Microsoft Dynamics 365", category: "CRM", auth_method: "OAuth2", self_serve_status: "Partially Gated", api_surface: "REST (OData v4); complex multi-entity model", buildability_verdict: "⚠️ Conditional", docs_url: "https://learn.microsoft.com/en-us/dynamics365/" },
+        { id: 10, app_name: "DealCloud", category: "CRM", auth_method: "OAuth2", self_serve_status: "Blocked", api_surface: "REST; private API behind enterprise contract", buildability_verdict: "❌ Blocked", docs_url: "https://www.intapp.com/dealcloud/" },
+        { id: 11, app_name: "Zendesk", category: "Helpdesk", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; comprehensive ticketing + user APIs", buildability_verdict: "✅ Ready", docs_url: "https://developer.zendesk.com/api-reference/" },
+        { id: 12, app_name: "Freshdesk", category: "Helpdesk", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; ticket/contact/company endpoints", buildability_verdict: "✅ Ready", docs_url: "https://developers.freshdesk.com/api/" },
+        { id: 13, app_name: "Intercom", category: "Helpdesk", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; conversations, contacts, events API", buildability_verdict: "✅ Ready", docs_url: "https://developers.intercom.com/docs" },
+        { id: 14, app_name: "ServiceNow", category: "Helpdesk", auth_method: "OAuth2", self_serve_status: "Partially Gated", api_surface: "REST (Table API); extensive ITSM model", buildability_verdict: "⚠️ Conditional", docs_url: "https://developer.servicenow.com/dev.do" },
+        { id: 15, app_name: "Help Scout", category: "Helpdesk", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; mailbox/conversation/customer APIs", buildability_verdict: "✅ Ready", docs_url: "https://developer.helpscout.com/" },
+        { id: 16, app_name: "Jira Service Management", category: "Helpdesk", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; Atlassian Connect + Forge APIs", buildability_verdict: "✅ Ready", docs_url: "https://developer.atlassian.com/cloud/jira/service-desk/rest/" },
+        { id: 17, app_name: "Kayako", category: "Helpdesk", auth_method: "API Key", self_serve_status: "Partially Gated", api_surface: "REST; conversations and cases API", buildability_verdict: "⚠️ Conditional", docs_url: "https://developer.kayako.com/" },
+        { id: 18, app_name: "Front", category: "Helpdesk", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; channels/conversations/contacts API", buildability_verdict: "✅ Ready", docs_url: "https://dev.frontapp.com/reference/introduction" },
+        { id: 19, app_name: "Gladly", category: "Helpdesk", auth_method: "API Key", self_serve_status: "Blocked", api_surface: "REST; customer-centric support API", buildability_verdict: "❌ Blocked", docs_url: "https://developer.gladly.com/" },
+        { id: 20, app_name: "Kustomer", category: "Helpdesk", auth_method: "API Key", self_serve_status: "Partially Gated", api_surface: "REST; customer/conversation/message endpoints", buildability_verdict: "⚠️ Conditional", docs_url: "https://developer.kustomer.com/" },
+        { id: 21, app_name: "Slack", category: "Messaging", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST + WebSocket; rich bot/app framework", buildability_verdict: "✅ Ready", docs_url: "https://api.slack.com/" },
+        { id: 22, app_name: "Discord", category: "Messaging", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST + WebSocket Gateway; bot token instant access", buildability_verdict: "✅ Ready", docs_url: "https://discord.com/developers/docs" },
+        { id: 23, app_name: "Microsoft Teams", category: "Messaging", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST (Graph API); Teams-specific endpoints", buildability_verdict: "✅ Ready", docs_url: "https://learn.microsoft.com/en-us/graph/teams-concept-overview" },
+        { id: 24, app_name: "Telegram", category: "Messaging", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST (Bot API); instant token via BotFather", buildability_verdict: "✅ Ready", docs_url: "https://core.telegram.org/bots/api" },
+        { id: 25, app_name: "Twilio", category: "Messaging", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; SMS/Voice/Video with account SID + auth token", buildability_verdict: "✅ Ready", docs_url: "https://www.twilio.com/docs/usage/api" },
+        { id: 26, app_name: "SendGrid", category: "Messaging", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; email sending/marketing/stats APIs", buildability_verdict: "✅ Ready", docs_url: "https://docs.sendgrid.com/api-reference" },
+        { id: 27, app_name: "WhatsApp Business", category: "Messaging", auth_method: "OAuth2", self_serve_status: "Partially Gated", api_surface: "REST (Cloud API); message templates require approval", buildability_verdict: "⚠️ Conditional", docs_url: "https://developers.facebook.com/docs/whatsapp/cloud-api" },
+        { id: 28, app_name: "Mailgun", category: "Messaging", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; email sending/receiving/validation", buildability_verdict: "✅ Ready", docs_url: "https://documentation.mailgun.com/en/latest/api_reference.html" },
+        { id: 29, app_name: "Vonage (Nexmo)", category: "Messaging", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; SMS/Voice/Verify with API key + secret", buildability_verdict: "✅ Ready", docs_url: "https://developer.vonage.com/en/api" },
+        { id: 30, app_name: "Pusher", category: "Messaging", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST + WebSocket; real-time channels/beams", buildability_verdict: "✅ Ready", docs_url: "https://pusher.com/docs" },
+        { id: 31, app_name: "Google Ads", category: "Marketing/Ads", auth_method: "OAuth2", self_serve_status: "Partially Gated", api_surface: "REST + gRPC; campaign/keyword/reporting APIs", buildability_verdict: "⚠️ Conditional", docs_url: "https://developers.google.com/google-ads/api/docs/start" },
+        { id: 32, app_name: "Meta Ads (Facebook)", category: "Marketing/Ads", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST (Graph API); campaigns/adsets/ads/insights", buildability_verdict: "✅ Ready", docs_url: "https://developers.facebook.com/docs/marketing-apis" },
+        { id: 33, app_name: "Mailchimp", category: "Marketing/Ads", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; lists/campaigns/automations/reports", buildability_verdict: "✅ Ready", docs_url: "https://mailchimp.com/developer/" },
+        { id: 34, app_name: "ActiveCampaign", category: "Marketing/Ads", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; contacts/deals/automations/campaigns", buildability_verdict: "✅ Ready", docs_url: "https://developers.activecampaign.com/reference" },
+        { id: 35, app_name: "LinkedIn Ads", category: "Marketing/Ads", auth_method: "OAuth2", self_serve_status: "Partially Gated", api_surface: "REST; campaign manager API with restricted scopes", buildability_verdict: "⚠️ Conditional", docs_url: "https://learn.microsoft.com/en-us/linkedin/marketing/" },
+        { id: 36, app_name: "Klaviyo", category: "Marketing/Ads", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; profiles/events/flows/campaigns v2 API", buildability_verdict: "✅ Ready", docs_url: "https://developers.klaviyo.com/en/reference/api-overview" },
+        { id: 37, app_name: "Brevo (Sendinblue)", category: "Marketing/Ads", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; contacts/email/SMS/transactional APIs", buildability_verdict: "✅ Ready", docs_url: "https://developers.brevo.com/reference" },
+        { id: 38, app_name: "Marketo", category: "Marketing/Ads", auth_method: "OAuth2", self_serve_status: "Blocked", api_surface: "REST; leads/campaigns/assets behind enterprise auth", buildability_verdict: "❌ Blocked", docs_url: "https://developers.marketo.com/rest-api/" },
+        { id: 39, app_name: "Constant Contact", category: "Marketing/Ads", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST v3; contacts/campaigns/reporting", buildability_verdict: "✅ Ready", docs_url: "https://developer.constantcontact.com/api_reference/index.html" },
+        { id: 40, app_name: "AdRoll", category: "Marketing/Ads", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; advertisables/campaigns/reporting APIs", buildability_verdict: "✅ Ready", docs_url: "https://developers.adroll.com/" },
+        { id: 41, app_name: "Shopify", category: "Ecommerce", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST + GraphQL (Admin & Storefront); full MCP-ready", buildability_verdict: "✅ Ready", docs_url: "https://shopify.dev/docs/api" },
+        { id: 42, app_name: "Stripe", category: "Ecommerce", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; payments/subscriptions/invoices with instant keys", buildability_verdict: "✅ Ready", docs_url: "https://docs.stripe.com/api" },
+        { id: 43, app_name: "WooCommerce", category: "Ecommerce", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; products/orders/customers with consumer key/secret", buildability_verdict: "✅ Ready", docs_url: "https://woocommerce.github.io/woocommerce-rest-api-docs/" },
+        { id: 44, app_name: "BigCommerce", category: "Ecommerce", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; catalog/orders/customers v3 API", buildability_verdict: "✅ Ready", docs_url: "https://developer.bigcommerce.com/docs/rest-catalog" },
+        { id: 45, app_name: "Square", category: "Ecommerce", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; payments/catalog/inventory/customers APIs", buildability_verdict: "✅ Ready", docs_url: "https://developer.squareup.com/reference/square" },
+        { id: 46, app_name: "Magento (Adobe Commerce)", category: "Ecommerce", auth_method: "OAuth2", self_serve_status: "Partially Gated", api_surface: "REST + GraphQL; products/orders/customers", buildability_verdict: "⚠️ Conditional", docs_url: "https://developer.adobe.com/commerce/webapi/" },
+        { id: 47, app_name: "PayPal", category: "Ecommerce", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; orders/payments/subscriptions/invoicing", buildability_verdict: "✅ Ready", docs_url: "https://developer.paypal.com/api/rest/" },
+        { id: 48, app_name: "Amazon SP-API", category: "Ecommerce", auth_method: "OAuth2", self_serve_status: "Partially Gated", api_surface: "REST; orders/catalog/feeds/reports with role-based access", buildability_verdict: "⚠️ Conditional", docs_url: "https://developer-docs.amazon.com/sp-api/" },
+        { id: 49, app_name: "Mollie", category: "Ecommerce", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; payments/refunds/customers/subscriptions", buildability_verdict: "✅ Ready", docs_url: "https://docs.mollie.com/reference/v2/payments-api/overview" },
+        { id: 50, app_name: "Saleor", category: "Ecommerce", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "GraphQL; products/orders/checkout headless commerce", buildability_verdict: "✅ Ready", docs_url: "https://docs.saleor.io/api-reference" },
+        { id: 51, app_name: "Firecrawl", category: "Data/Scraping", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; crawl/scrape/map with structured output", buildability_verdict: "✅ Ready", docs_url: "https://docs.firecrawl.dev/api-reference" },
+        { id: 52, app_name: "ScrapingBee", category: "Data/Scraping", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; web scraping with JS rendering", buildability_verdict: "✅ Ready", docs_url: "https://www.scrapingbee.com/documentation/" },
+        { id: 53, app_name: "Apify", category: "Data/Scraping", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; actors/datasets/key-value stores/webhooks", buildability_verdict: "✅ Ready", docs_url: "https://docs.apify.com/api/v2" },
+        { id: 54, app_name: "Clearbit", category: "Data/Scraping", auth_method: "API Key", self_serve_status: "Partially Gated", api_surface: "REST; enrichment/prospector/reveal APIs", buildability_verdict: "⚠️ Conditional", docs_url: "https://dashboard.clearbit.com/docs" },
+        { id: 55, app_name: "Ahrefs", category: "Data/Scraping", auth_method: "API Key", self_serve_status: "Blocked", api_surface: "REST; backlinks/keywords behind paywall", buildability_verdict: "❌ Blocked", docs_url: "https://ahrefs.com/api" },
+        { id: 56, app_name: "SimilarWeb", category: "Data/Scraping", auth_method: "API Key", self_serve_status: "Blocked", api_surface: "REST; traffic/engagement behind enterprise gate", buildability_verdict: "❌ Blocked", docs_url: "https://developers.similarweb.com/" },
+        { id: 57, app_name: "Diffbot", category: "Data/Scraping", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; article/product extraction + Knowledge Graph", buildability_verdict: "✅ Ready", docs_url: "https://docs.diffbot.com/" },
+        { id: 58, app_name: "ZoomInfo", category: "Data/Scraping", auth_method: "OAuth2", self_serve_status: "Blocked", api_surface: "REST; contact/company enrichment behind enterprise wall", buildability_verdict: "❌ Blocked", docs_url: "https://developer.zoominfo.com/" },
+        { id: 59, app_name: "Bright Data", category: "Data/Scraping", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; proxy/scraping/datasets with zone-based auth", buildability_verdict: "✅ Ready", docs_url: "https://docs.brightdata.com/api-reference" },
+        { id: 60, app_name: "Octoparse", category: "Data/Scraping", auth_method: "API Key", self_serve_status: "Partially Gated", api_surface: "REST; task/data export APIs on cloud plans", buildability_verdict: "⚠️ Conditional", docs_url: "https://www.octoparse.com/api" },
+        { id: 61, app_name: "GitHub", category: "Dev & Infra", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST + GraphQL; repos/issues/PRs with fine-grained PATs", buildability_verdict: "✅ Ready", docs_url: "https://docs.github.com/en/rest" },
+        { id: 62, app_name: "GitLab", category: "Dev & Infra", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST + GraphQL; projects/pipelines/MRs", buildability_verdict: "✅ Ready", docs_url: "https://docs.gitlab.com/ee/api/" },
+        { id: 63, app_name: "Vercel", category: "Dev & Infra", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; deployments/projects/domains/env-vars", buildability_verdict: "✅ Ready", docs_url: "https://vercel.com/docs/rest-api" },
+        { id: 64, app_name: "AWS", category: "Dev & Infra", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; service-specific APIs with IAM sig-v4 auth", buildability_verdict: "✅ Ready", docs_url: "https://docs.aws.amazon.com/" },
+        { id: 65, app_name: "Google Cloud", category: "Dev & Infra", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST + gRPC; service-specific APIs", buildability_verdict: "✅ Ready", docs_url: "https://cloud.google.com/apis/docs/overview" },
+        { id: 66, app_name: "Cloudflare", category: "Dev & Infra", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; DNS/zones/workers/R2/KV", buildability_verdict: "✅ Ready", docs_url: "https://developers.cloudflare.com/api/" },
+        { id: 67, app_name: "Docker Hub", category: "Dev & Infra", auth_method: "Basic/PAT", self_serve_status: "Self-Serve", api_surface: "REST; repositories/tags/images with PAT auth", buildability_verdict: "✅ Ready", docs_url: "https://docs.docker.com/docker-hub/api/latest/" },
+        { id: 68, app_name: "Datadog", category: "Dev & Infra", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; metrics/logs/monitors/dashboards", buildability_verdict: "✅ Ready", docs_url: "https://docs.datadoghq.com/api/" },
+        { id: 69, app_name: "PagerDuty", category: "Dev & Infra", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; incidents/services/schedules", buildability_verdict: "✅ Ready", docs_url: "https://developer.pagerduty.com/api-reference/" },
+        { id: 70, app_name: "Terraform Cloud", category: "Dev & Infra", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; workspaces/runs/state with team tokens", buildability_verdict: "✅ Ready", docs_url: "https://developer.hashicorp.com/terraform/cloud-docs/api-docs" },
+        { id: 71, app_name: "Jira", category: "Productivity/PM", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; issues/projects/boards/sprints", buildability_verdict: "✅ Ready", docs_url: "https://developer.atlassian.com/cloud/jira/platform/rest/v3/" },
+        { id: 72, app_name: "Asana", category: "Productivity/PM", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; tasks/projects/portfolios/goals API", buildability_verdict: "✅ Ready", docs_url: "https://developers.asana.com/reference" },
+        { id: 73, app_name: "Trello", category: "Productivity/PM", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; boards/lists/cards/members", buildability_verdict: "✅ Ready", docs_url: "https://developer.atlassian.com/cloud/trello/rest/" },
+        { id: 74, app_name: "Notion", category: "Productivity/PM", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; pages/databases/blocks/users API", buildability_verdict: "✅ Ready", docs_url: "https://developers.notion.com/" },
+        { id: 75, app_name: "ClickUp", category: "Productivity/PM", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; tasks/spaces/goals v2 API", buildability_verdict: "✅ Ready", docs_url: "https://clickup.com/api" },
+        { id: 76, app_name: "Linear", category: "Productivity/PM", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "GraphQL; issues/projects/cycles/teams API", buildability_verdict: "✅ Ready", docs_url: "https://developers.linear.app/docs" },
+        { id: 77, app_name: "Basecamp", category: "Productivity/PM", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; projects/to-dos/messages/schedules", buildability_verdict: "✅ Ready", docs_url: "https://github.com/basecamp/bc3-api" },
+        { id: 78, app_name: "Confluence", category: "Productivity/PM", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; pages/spaces/content/search", buildability_verdict: "✅ Ready", docs_url: "https://developer.atlassian.com/cloud/confluence/rest/" },
+        { id: 79, app_name: "Smartsheet", category: "Productivity/PM", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; sheets/rows/columns/attachments", buildability_verdict: "✅ Ready", docs_url: "https://smartsheet.redoc.ly/" },
+        { id: 80, app_name: "Wrike", category: "Productivity/PM", auth_method: "OAuth2", self_serve_status: "Partially Gated", api_surface: "REST; tasks/folders/projects/timelog APIs", buildability_verdict: "⚠️ Conditional", docs_url: "https://developers.wrike.com/overview/" },
+        { id: 81, app_name: "QuickBooks Online", category: "Finance/Fintech", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; invoices/payments/accounts/reports", buildability_verdict: "✅ Ready", docs_url: "https://developer.intuit.com/" },
+        { id: 82, app_name: "Xero", category: "Finance/Fintech", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; invoices/contacts/bank-transactions", buildability_verdict: "✅ Ready", docs_url: "https://developer.xero.com/documentation/api/accounting/overview" },
+        { id: 83, app_name: "Plaid", category: "Finance/Fintech", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; accounts/transactions/identity with sandbox", buildability_verdict: "✅ Ready", docs_url: "https://plaid.com/docs/api/" },
+        { id: 84, app_name: "Brex", category: "Finance/Fintech", auth_method: "OAuth2", self_serve_status: "Partially Gated", api_surface: "REST; cards/transactions/expenses", buildability_verdict: "⚠️ Conditional", docs_url: "https://developer.brex.com/" },
+        { id: 85, app_name: "Wave", category: "Finance/Fintech", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "GraphQL; invoices/customers/accounts", buildability_verdict: "✅ Ready", docs_url: "https://developer.waveapps.com/" },
+        { id: 86, app_name: "FreshBooks", category: "Finance/Fintech", auth_method: "OAuth2", self_serve_status: "Self-Serve", api_surface: "REST; invoices/expenses/clients/payments", buildability_verdict: "✅ Ready", docs_url: "https://www.freshbooks.com/api/start" },
+        { id: 87, app_name: "Chargebee", category: "Finance/Fintech", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; subscriptions/invoices/customers", buildability_verdict: "✅ Ready", docs_url: "https://apidocs.chargebee.com/docs/api/" },
+        { id: 88, app_name: "Recurly", category: "Finance/Fintech", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; subscriptions/accounts/invoices v4 API", buildability_verdict: "✅ Ready", docs_url: "https://developers.recurly.com/api/v2021-02-25/" },
+        { id: 89, app_name: "Sage Intacct", category: "Finance/Fintech", auth_method: "Custom/Other", self_serve_status: "Blocked", api_surface: "REST + XML; complex multi-entity financial APIs", buildability_verdict: "❌ Blocked", docs_url: "https://developer.intacct.com/api/" },
+        { id: 90, app_name: "Ramp", category: "Finance/Fintech", auth_method: "OAuth2", self_serve_status: "Partially Gated", api_surface: "REST; transactions/cards/reimbursements", buildability_verdict: "⚠️ Conditional", docs_url: "https://docs.ramp.com/reference" },
+        { id: 91, app_name: "OpenAI", category: "AI/Media", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; chat/completions/embeddings/images/audio", buildability_verdict: "✅ Ready", docs_url: "https://platform.openai.com/docs/api-reference" },
+        { id: 92, app_name: "Anthropic", category: "AI/Media", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; messages API with x-api-key header", buildability_verdict: "✅ Ready", docs_url: "https://docs.anthropic.com/en/api" },
+        { id: 93, app_name: "ElevenLabs", category: "AI/Media", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; text-to-speech/voice-cloning APIs", buildability_verdict: "✅ Ready", docs_url: "https://elevenlabs.io/docs/api-reference" },
+        { id: 94, app_name: "Stability AI", category: "AI/Media", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; image generation/editing/upscaling APIs", buildability_verdict: "✅ Ready", docs_url: "https://platform.stability.ai/docs/api-reference" },
+        { id: 95, app_name: "Replicate", category: "AI/Media", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; predictions/models/deployments", buildability_verdict: "✅ Ready", docs_url: "https://replicate.com/docs/reference/http" },
+        { id: 96, app_name: "Hugging Face", category: "AI/Media", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; inference/models/datasets/spaces", buildability_verdict: "✅ Ready", docs_url: "https://huggingface.co/docs/api-inference" },
+        { id: 97, app_name: "Cloudinary", category: "AI/Media", auth_method: "API Key", self_serve_status: "Self-Serve", api_surface: "REST; upload/transform/manage media", buildability_verdict: "✅ Ready", docs_url: "https://cloudinary.com/documentation/image_upload_api_reference" },
+        { id: 98, app_name: "Mux", category: "AI/Media", auth_method: "Basic/PAT", self_serve_status: "Self-Serve", api_surface: "REST; video/live-stream/data APIs", buildability_verdict: "✅ Ready", docs_url: "https://docs.mux.com/api-reference" },
+        { id: 99, app_name: "Runway ML", category: "AI/Media", auth_method: "API Key", self_serve_status: "Partially Gated", api_surface: "REST; video generation/image-to-video", buildability_verdict: "⚠️ Conditional", docs_url: "https://docs.dev.runwayml.com/" },
+        { id: 100, app_name: "Synthesia", category: "AI/Media", auth_method: "API Key", self_serve_status: "Blocked", api_surface: "REST; video generation/avatars behind enterprise paywall", buildability_verdict: "❌ Blocked", docs_url: "https://docs.synthesia.io/reference" },
+      ];
+
+      // ----------------------------------------------------------------
+      // CHART.JS — Initialize Charts
+      // ----------------------------------------------------------------
+      const chartDefaults = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+        },
+      };
+
+      // Readiness Doughnut
+      new Chart(document.getElementById('readinessChart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Ready', 'Conditional', 'Blocked'],
+          datasets: [{
+            data: [71, 16, 13],
+            backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+            borderColor: ['#059669', '#d97706', '#dc2626'],
+            borderWidth: 2,
+            hoverOffset: 8,
+          }]
+        },
+        options: {
+          ...chartDefaults,
+          cutout: '65%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(15, 23, 42, 0.9)',
+              borderColor: 'rgba(59, 130, 246, 0.3)',
+              borderWidth: 1,
+              titleFont: { family: 'Inter', weight: '600' },
+              bodyFont: { family: 'Inter' },
+              padding: 12,
+              cornerRadius: 8,
+              callbacks: {
+                label: (ctx) => ` ${ctx.label}: ${ctx.parsed} apps (${Math.round(ctx.parsed)}%)`
+              }
+            }
+          }
+        }
+      });
+
+      // Auth Bar Chart
+      new Chart(document.getElementById('authChart'), {
+        type: 'bar',
+        data: {
+          labels: ['OAuth2', 'API Key', 'Basic/PAT', 'Custom'],
+          datasets: [{
+            data: [54, 39, 5, 2],
+            backgroundColor: [
+              'rgba(139, 92, 246, 0.7)',
+              'rgba(59, 130, 246, 0.7)',
+              'rgba(168, 162, 158, 0.7)',
+              'rgba(236, 72, 153, 0.7)',
+            ],
+            borderColor: [
+              'rgba(139, 92, 246, 1)',
+              'rgba(59, 130, 246, 1)',
+              'rgba(168, 162, 158, 1)',
+              'rgba(236, 72, 153, 1)',
+            ],
+            borderWidth: 1.5,
+            borderRadius: 6,
+            barThickness: 36,
+          }]
+        },
+        options: {
+          ...chartDefaults,
+          indexAxis: 'y',
+          scales: {
+            x: {
+              beginAtZero: true,
+              max: 60,
+              grid: { color: 'rgba(30, 58, 138, 0.15)' },
+              ticks: { color: '#64748b', font: { family: 'Inter', size: 11 } },
+            },
+            y: {
+              grid: { display: false },
+              ticks: { color: '#94a3b8', font: { family: 'Inter', size: 12, weight: '500' } },
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(15, 23, 42, 0.9)',
+              borderColor: 'rgba(59, 130, 246, 0.3)',
+              borderWidth: 1,
+              titleFont: { family: 'Inter', weight: '600' },
+              bodyFont: { family: 'Inter' },
+              padding: 12,
+              cornerRadius: 8,
+            }
+          }
+        }
+      });
+
+      // Access Pie Chart
+      new Chart(document.getElementById('accessChart'), {
+        type: 'pie',
+        data: {
+          labels: ['Instant Self-Serve', 'Sales/Enterprise Gated'],
+          datasets: [{
+            data: [78, 22],
+            backgroundColor: ['#06b6d4', '#f97316'],
+            borderColor: ['#0891b2', '#ea580c'],
+            borderWidth: 2,
+            hoverOffset: 10,
+          }]
+        },
+        options: {
+          ...chartDefaults,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(15, 23, 42, 0.9)',
+              borderColor: 'rgba(59, 130, 246, 0.3)',
+              borderWidth: 1,
+              titleFont: { family: 'Inter', weight: '600' },
+              bodyFont: { family: 'Inter' },
+              padding: 12,
+              cornerRadius: 8,
+              callbacks: {
+                label: (ctx) => ` ${ctx.label}: ${ctx.parsed}%`
+              }
+            }
+          }
+        }
+      });
+
+      // ----------------------------------------------------------------
+      // PROGRESS BARS — Animate on scroll
+      // ----------------------------------------------------------------
+      const deltaObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            setTimeout(() => {
+              document.getElementById('pass1Bar').style.width = '74%';
+            }, 200);
+            setTimeout(() => {
+              document.getElementById('pass2Bar').style.width = '92%';
+            }, 500);
+            deltaObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.3 });
+      deltaObserver.observe(document.getElementById('delta'));
+
+      // ----------------------------------------------------------------
+      // TABLE — Render & Filter
+      // ----------------------------------------------------------------
+      const tableBody = document.getElementById('tableBody');
+      const searchInput = document.getElementById('searchInput');
+      const categoryFilter = document.getElementById('categoryFilter');
+      const resultCount = document.getElementById('resultCount');
+
+      function getAuthBadgeClass(method) {
+        const map = {
+          'OAuth2': 'badge-oauth2',
+          'API Key': 'badge-apikey',
+          'Basic/PAT': 'badge-basic',
+          'Custom/Other': 'badge-custom',
+        };
+        return map[method] || 'badge-apikey';
+      }
+
+      function getServeBadgeClass(status) {
+        const map = {
+          'Self-Serve': 'badge-selfserve',
+          'Partially Gated': 'badge-partial',
+          'Blocked': 'badge-blockedserve',
+        };
+        return map[status] || 'badge-partial';
+      }
+
+      function getVerdictBadgeClass(verdict) {
+        if (verdict.includes('Ready')) return 'badge-ready';
+        if (verdict.includes('Conditional')) return 'badge-conditional';
+        return 'badge-blocked';
+      }
+
+      function renderTable(data) {
+        tableBody.innerHTML = data.map((app, i) => `
+          <tr class="border-b border-blue-900/10 data-row ${i % 2 === 0 ? 'bg-transparent' : 'bg-slate-900/20'}">
+            <td class="px-4 py-3 text-slate-500 font-mono text-xs">${app.id}</td>
+            <td class="px-4 py-3 font-semibold text-white">${app.app_name}</td>
+            <td class="px-4 py-3">
+              <span class="px-2 py-0.5 rounded-full text-xs bg-blue-950/60 text-blue-400 border border-blue-900/40">${app.category}</span>
+            </td>
+            <td class="px-4 py-3">
+              <span class="px-2 py-0.5 rounded-full text-xs ${getAuthBadgeClass(app.auth_method)}">${app.auth_method}</span>
+            </td>
+            <td class="px-4 py-3">
+              <span class="px-2 py-0.5 rounded-full text-xs ${getServeBadgeClass(app.self_serve_status)}">${app.self_serve_status}</span>
+            </td>
+            <td class="px-4 py-3 text-xs text-slate-400 leading-relaxed">${app.api_surface}</td>
+            <td class="px-4 py-3">
+              <span class="px-2 py-0.5 rounded-full text-xs ${getVerdictBadgeClass(app.buildability_verdict)}">${app.buildability_verdict}</span>
+            </td>
+            <td class="px-4 py-3">
+              <a href="${app.docs_url}" target="_blank" rel="noopener" class="text-blue-400 hover:text-blue-300 transition-colors text-xs underline underline-offset-2">Docs ↗</a>
+            </td>
+          </tr>
+        `).join('');
+        resultCount.textContent = data.length;
+      }
+
+      function filterData() {
+        const search = searchInput.value.toLowerCase().trim();
+        const category = categoryFilter.value;
+
+        let filtered = APP_DATA;
+
+        if (category !== 'all') {
+          filtered = filtered.filter(app => app.category === category);
+        }
+
+        if (search) {
+          filtered = filtered.filter(app =>
+            app.app_name.toLowerCase().includes(search) ||
+            app.category.toLowerCase().includes(search) ||
+            app.auth_method.toLowerCase().includes(search) ||
+            app.self_serve_status.toLowerCase().includes(search) ||
+            app.api_surface.toLowerCase().includes(search) ||
+            app.buildability_verdict.toLowerCase().includes(search)
+          );
+        }
+
+        renderTable(filtered);
+      }
+
+      // Debounced search
+      let searchTimeout;
+      searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(filterData, 200);
+      });
+      categoryFilter.addEventListener('change', filterData);
+
+      // Initial render
+      renderTable(APP_DATA);
+
+      // ----------------------------------------------------------------
+      // SCROLL ANIMATIONS — Fade in sections
+      // ----------------------------------------------------------------
+      const fadeObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+      document.querySelectorAll('.fade-section').forEach(el => fadeObserver.observe(el));
+
+      // ----------------------------------------------------------------
+      // NAVIGATION DOTS — Active state tracking
+      // ----------------------------------------------------------------
+      const sections = ['hero', 'analytics', 'delta', 'rootcause', 'verification', 'matrix'];
+      const navObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            document.querySelectorAll('.nav-dot').forEach(dot => dot.classList.remove('active'));
+            const dot = document.getElementById(`nav-${entry.target.id}`);
+            if (dot) dot.classList.add('active');
+          }
+        });
+      }, { threshold: 0.3 });
+
+      sections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) navObserver.observe(el);
+      });
+    });
+  </script>
+</body>
+</html>

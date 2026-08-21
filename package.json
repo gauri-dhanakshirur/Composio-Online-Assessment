@@ -1,0 +1,17 @@
+{
+  "name": "composio-api-audit",
+  "version": "1.0.0",
+  "description": "Autonomous API integration audit pipeline for 100 software platforms",
+  "type": "module",
+  "scripts": {
+    "verify": "tsx playwright_verifier.ts",
+    "agent": "python agent.py"
+  },
+  "dependencies": {
+    "playwright": "^1.44.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.11.0",
+    "typescript": "^5.4.0"
+  }
+}
