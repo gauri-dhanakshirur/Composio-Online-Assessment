@@ -48,7 +48,7 @@
           <h1 class="text-3xl font-extrabold tracking-tight text-white">Can AI Agents Actually Use 100 Popular Apps?
           </h1>
           <p class="text-sm text-blue-200/90 max-w-2xl leading-relaxed">
-            We tested 100 top tools (like Slack, Stripe, and Google Ads) using an autonomous research bot. The verdict:
+            Tested 100 top tools (like Slack, Stripe, and Google Ads) using an autonomous research bot. The verdict:
             <strong>71% are immediately buildable today</strong>, while the rest are gated by sales demos, review
             queues, or paywalls.
           </p>
@@ -148,37 +148,55 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         <div class="space-y-3">
-          <h3 class="text-xs font-bold text-blue-300 uppercase tracking-widest">Autonomous 3-Stage Pipeline</h3>
+          <h3 class="text-xs font-bold text-blue-300 uppercase tracking-widest">Multi-Sub-Agent Architecture (agent.py)</h3>
 
           <div class="p-3 bg-black rounded-xl border border-blue-900 text-xs space-y-1">
             <div class="font-bold text-blue-400 flex items-center gap-2">
               <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-              Stage 1: Web Discovery & OpenAPI Scraping (Composio)
+              1. OrchestratorAgent (Planner & Task Router)
             </div>
             <p class="text-blue-100/80 leading-relaxed">
-              Bot scraped developer hubs, auth guides, and OpenAPI/Swagger JSON specs across all 100 domains.
+              Deconstructs target app lists into sub-tasks, dispatches work, and manages pipeline execution lifecycle.
             </p>
           </div>
 
           <div class="p-3 bg-black rounded-xl border border-blue-900 text-xs space-y-1">
             <div class="font-bold text-blue-400 flex items-center gap-2">
               <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-              Stage 2: Headless Browser Probing (Playwright)
+              2. DiscoverySubAgent (Composio Web / Firecrawl)
             </div>
             <p class="text-blue-100/80 leading-relaxed">
-              Headless browser navigated live <code
-                class="font-mono text-white bg-blue-950 px-1 py-0.5 rounded">/signup</code> portals to detect sales demo
-              walls vs instant signups.
+              Queries developer portals, auth guides, and fetches OpenAPI/Swagger JSON specs via Composio SDK.
             </p>
           </div>
 
           <div class="p-3 bg-black rounded-xl border border-blue-900 text-xs space-y-1">
             <div class="font-bold text-blue-400 flex items-center gap-2">
               <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-              Stage 3: Schema & Assertion Engine
+              3. SchemaExtractorAgent (Instructor / Pydantic / GPT-4o)
             </div>
             <p class="text-blue-100/80 leading-relaxed">
-              Validated endpoints, rate limits, and cross-referenced MCP agent tool availability.
+              Enforces structured JSON extraction for auth methods, self-serve status, gating barriers, and MCP readiness.
+            </p>
+          </div>
+
+          <div class="p-3 bg-black rounded-xl border border-blue-900 text-xs space-y-1">
+            <div class="font-bold text-purple-400 flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+              4. HeadlessVerifierAgent (Playwright Chromium / browser-use)
+            </div>
+            <p class="text-blue-100/80 leading-relaxed">
+              Probes live <code class="font-mono text-white bg-blue-950 px-1 py-0.5 rounded">/signup</code> portals to assert sales-walls vs. instant key generation.
+            </p>
+          </div>
+
+          <div class="p-3 bg-black rounded-xl border border-blue-900 text-xs space-y-1">
+            <div class="font-bold text-amber-400 flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+              5. EvaluatorAgent (Self-Correction Loop)
+            </div>
+            <p class="text-blue-100/80 leading-relaxed">
+              Cross-references raw doc claims with live browser probe assertions and computes the two-pass accuracy delta.
             </p>
           </div>
         </div>
@@ -283,7 +301,8 @@
             <div class="flex items-center justify-between">
               <h3 class="text-xs font-bold text-blue-300 uppercase tracking-widest">Runnable Terminal Trigger</h3>
               <span
-                class="text-[10px] font-mono text-blue-400 bg-blue-950 px-2 py-0.5 rounded border border-blue-800">npm verify</span>
+                class="text-[10px] font-mono text-blue-400 bg-blue-950 px-2 py-0.5 rounded border border-blue-800">npm
+                verify</span>
             </div>
             <pre
               class="bg-[#050b14] p-3 rounded-lg border border-blue-900/70 font-mono text-[11px] text-blue-200 mt-2 overflow-x-auto leading-relaxed"><code># 1. Clone & install dependencies
